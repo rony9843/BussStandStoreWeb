@@ -29,9 +29,7 @@ export default function QrCodeGenerator({ AccountNumber }) {
 
   return (
     <div>
-      <div>
-        <img src={QrCodeImg} alt="" />
-      </div>
+      <div></div>
     </div>
   );
 }

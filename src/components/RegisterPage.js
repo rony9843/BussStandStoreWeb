@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-export default function RegisterPage() {
+export default function RegisterPage({ setPageState }) {
   const [error, setError] = useState({
     message: "",
     state: false,
   });
+
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+
+  const submitBtn = () => {
+    if (email === "masumkaka223@gmail.com" && pass === "masumkaka111") {
+      setPageState("Main");
+    } else {
+      setError({
+        message: "Please, Enter valid email and password",
+        state: true,
+      });
+    }
+  };
 
   return (
     <StyleDiv>
@@ -24,6 +38,7 @@ export default function RegisterPage() {
                 className="form-control"
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -34,16 +49,13 @@ export default function RegisterPage() {
                 type="password"
                 className="form-control"
                 id="exampleInputPassword1"
+                onChange={(e) => setPass(e.target.value)}
               />
             </div>
 
             <button
-              onClick={() =>
-                setError({
-                  message: "",
-                  state: true,
-                })
-              }
+              onClick={() => submitBtn()}
+              //   onClick={() => setPageState("Main")}
               type="submit"
               className="btn btn-primary w-100"
             >
@@ -52,7 +64,7 @@ export default function RegisterPage() {
           </div>
           {error.state && (
             <div className="alert alert-danger mt-5" role="alert">
-              A simple danger alert—check it out!
+              {error.message}
             </div>
           )}
         </div>
