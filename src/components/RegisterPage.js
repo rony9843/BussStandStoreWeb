@@ -7,6 +7,9 @@ export default function RegisterPage() {
     <StyleDiv>
       <div>
         <div>
+          <h1>this is demo</h1>
+        </div>
+        <div>
           <QrCodeGenerator AccountNumber={6765765}></QrCodeGenerator>
         </div>
       </div>
