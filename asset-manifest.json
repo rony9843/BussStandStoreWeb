@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/BussStandStoreWeb/static/css/main.2e638910.css",
-    "main.js": "/BussStandStoreWeb/static/js/main.fd6140ba.js",
+    "main.js": "/BussStandStoreWeb/static/js/main.f12f2115.js",
     "static/js/787.930a2d55.chunk.js": "/BussStandStoreWeb/static/js/787.930a2d55.chunk.js",
     "index.html": "/BussStandStoreWeb/index.html",
     "main.2e638910.css.map": "/BussStandStoreWeb/static/css/main.2e638910.css.map",
-    "main.fd6140ba.js.map": "/BussStandStoreWeb/static/js/main.fd6140ba.js.map",
+    "main.f12f2115.js.map": "/BussStandStoreWeb/static/js/main.f12f2115.js.map",
     "787.930a2d55.chunk.js.map": "/BussStandStoreWeb/static/js/787.930a2d55.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.2e638910.css",
-    "static/js/main.fd6140ba.js"
+    "static/js/main.f12f2115.js"
   ]
 }
