@@ -17,6 +17,7 @@ export default function QrCodeGenerator({ AccountNumber }) {
   const generateQrCode = async (props) => {
     try {
       const res = await QRCode.toDataURL(`"${props}"`);
+      console.log(res);
       setQrCodeImg(res);
     } catch (error) {
       console.log("error for qrcode ", error);
@@ -29,7 +30,9 @@ export default function QrCodeGenerator({ AccountNumber }) {
 
   return (
     <div>
-      <div></div>
+      <div className="w-100">
+        <img style={{ width: "50%" }} src={QrCodeImg} alt="" />
+      </div>
     </div>
   );
 }

@@ -1,11 +1,6 @@
 import React from "react";
+import AddUser from "../AddUser/AddUser";
 
 export default function MainRightSide({ optionSelection }) {
-  return (
-    <div>
-      <div>
-        <h1>{optionSelection}</h1>
-      </div>
-    </div>
-  );
+  return <div>{optionSelection === "Add User" && <AddUser />}</div>;
 }
