@@ -1,144 +1,313 @@
 import Button from "@mui/material/Button";
-import React, { useRef, useState } from "react";
+import QRCode from "qrcode";
+import React, { useEffect, useRef, useState } from "react";
 import StickyBox from "react-sticky-box";
 import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
 
-export default function AddUser() {
+export default function AddUser({ optionSelection }) {
   const componentRef = useRef();
 
   const [userImage, setUserImage] = useState(
     "https://i.ibb.co/zSXHJ2M/blank-profile-picture-gbaab5039d-1280.png"
   );
 
+  const [pageMode, setPageMode] = useState("create");
+
   const [inputImage, setInputImage] = useState("");
   const [infoType, setInfoType] = useState("NID");
-  const accountNumber = Math.floor(Math.random() * 9000000000) + 1000000000;
+  const [accountNumber, _setAccountNumber] = useState(
+    Math.floor(Math.random() * 9000000000) + 1000000000
+  );
+
+  const [loading, setLoading] = useState(false);
+  const [QrCodeImg, setQrCodeImg] = useState();
+  const [userName, setUserName] = useState("");
+  const [userIdNumber, setUserIdNumber] = useState("");
+  const [userDate, setUserDate] = useState("");
+  const [userMonth, setUserMonth] = useState("");
+  const [userYear, setUserYear] = useState("");
+  const [userFathersName, setUserFathersName] = useState("");
+  const [userMothersName, setUserMothersName] = useState("");
+  const [userPrimaryPhoneNumber, setUserPrimaryPhoneNumber] = useState("");
+  const [userSecondaryPhoneNumber, setUserSecondaryPhoneNumber] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userVillage, setUserVillage] = useState("");
+  const [userUnion, setUserUnion] = useState("");
+  const [userThana, setUserThana] = useState("");
+  const [userZela, setUserZela] = useState("");
+  const [userCredit, setUserCredit] = useState("");
+  const [userPin, setUserPin] = useState("");
+
+  // ? error
+  const [error, setError] = useState({
+    state: false,
+    message: "",
+  });
 
   const onImageSubmitBtn = () => {
     setUserImage(inputImage);
   };
 
+  const generateQrCode = async (props) => {
+    try {
+      const res = await QRCode.toDataURL(`"${props}"`);
+      console.log(res);
+
+      setQrCodeImg(res);
+    } catch (error) {
+      console.log("error for qrcode ", error);
+    }
+  };
+
+  useEffect(() => {
+    generateQrCode(accountNumber);
+  }, [accountNumber]);
+
   // nid submit btn
   const submitBtn = () => {
-    fetch("http://localhost:9990/createUser", {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: "jubayth hossen roni" }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    if (userName === "") {
+      setError({
+        state: true,
+        message: "Please, Enter valid name",
       });
+    } else if (userIdNumber === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid ${infoType} Number`,
+      });
+    } else if (userDate === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Date of Birth`,
+      });
+    } else if (userMonth === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Date of Birth`,
+      });
+    } else if (userYear === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Date of Birth`,
+      });
+    } else if (userFathersName === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Father's name`,
+      });
+    } else if (userMothersName === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Mother's name`,
+      });
+    } else if (userPrimaryPhoneNumber === "") {
+      setError({
+        state: true,
+        message: `Please, Enter valid Primary Phone Number`,
+      });
+    } else if (userVillage === "") {
+      setError({
+        state: true,
+        message: `Please, Enter গ্রাম`,
+      });
+    } else if (userUnion === "") {
+      setError({
+        state: true,
+        message: `Please, Enter ইউনিয়ন`,
+      });
+    } else if (userThana === "") {
+      setError({
+        state: true,
+        message: `Please, Enter থানা`,
+      });
+    } else if (userZela === "") {
+      setError({
+        state: true,
+        message: `Please, Enter জেলা`,
+      });
+    } else if (userCredit === "") {
+      setError({
+        state: true,
+        message: `Please, Enter Credit`,
+      });
+    } else if (userPin === "") {
+      setError({
+        state: true,
+        message: `Please, Enter Pin`,
+      });
+    } else if (inputImage === "") {
+      setError({
+        state: true,
+        message: `Please, Enter Image Link`,
+      });
+    } else {
+      const payload = {
+        userName,
+        userImage,
+        userAccountNumber: accountNumber,
+        qrCodeImage: QrCodeImg,
+        infoType,
+        userIdNumber,
+        userDate,
+        userMonth,
+        userYear,
+        userFathersName,
+        userMothersName,
+        userPrimaryPhoneNumber,
+        userSecondaryPhoneNumber:
+          userSecondaryPhoneNumber === "" ? null : userSecondaryPhoneNumber,
+        userEmail: userEmail === "" ? null : userEmail,
+        userVillage,
+        userUnion,
+        userThana,
+        userZela,
+        userCredit,
+        userPin,
+        createdDate: new Date(),
+      };
+      setLoading(true);
+
+      fetch("http://localhost:9990/createUser", {
+        method: "POST", // or 'PUT'
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+          setLoading(false);
+          if (data.status === 200) {
+            setPageMode("pdf");
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          console.error("Error:", error);
+        });
+    }
   };
+
+  /**
+   * ? jela
+   * ? thana
+   * ? union
+   * ? village
+   */
 
   return (
     <AddUserStyle>
-      <div className="p-2">
-        <h3>Add User</h3>
-        <div className="row w-100">
-          <div className="col-4">
-            <StickyBox offsetTop={20} offsetBottom={20}>
-              <div>
-                <img
-                  src={userImage}
-                  alt=""
-                  style={{ height: "100%", width: "100%", borderRadius: "10%" }}
-                />
-              </div>
-              <div className="input-group mb-3 mt-4">
+      {pageMode === "create" ? (
+        <div className="p-2">
+          <h3>Add User</h3>
+          <div className="row w-100">
+            <div className="col-4">
+              <StickyBox offsetTop={20} offsetBottom={20}>
+                <div>
+                  <img
+                    src={userImage}
+                    alt=""
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      borderRadius: "10%",
+                    }}
+                  />
+                </div>
+                <div className="input-group mb-3 mt-4">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="User Image link"
+                    aria-label="Recipient's username"
+                    aria-describedby="button-addon2"
+                    onChange={(e) => setInputImage(e.target.value)}
+                    value={inputImage}
+                  />
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                    onClick={() => onImageSubmitBtn()}
+                  >
+                    Press
+                  </button>
+                </div>
+
+                <div>
+                  Account Number :{" "}
+                  <b style={{ color: "red" }}>{accountNumber}</b>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <QrCodeGenerator QrCodeImg={QrCodeImg} />
+                </div>
+              </StickyBox>
+            </div>
+
+            <div className="col-8">
+              <div className="mb-3">
+                <label for="userName" className="form-label">
+                  Name
+                </label>
                 <input
+                  onChange={(e) => setUserName(e.target.value)}
                   type="text"
                   className="form-control"
-                  placeholder="User Image link"
-                  aria-label="Recipient's username"
-                  aria-describedby="button-addon2"
-                  onChange={(e) => setInputImage(e.target.value)}
-                  value={inputImage}
+                  id="userName"
+                  aria-describedby="text"
                 />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  id="button-addon2"
-                  onClick={() => onImageSubmitBtn()}
-                >
-                  Press
-                </button>
+              </div>
+              <div className="infoTypeContainerBox">
+                <div className="infoTypeContainer">
+                  <div
+                    className={`${
+                      infoType === "NID" ? "infoOptionSelection" : "infoOption"
+                    }`}
+                    onClick={() => setInfoType("NID")}
+                  >
+                    NID
+                  </div>
+                  <div
+                    className={`${
+                      infoType === "জন্ম নিবন্ধন"
+                        ? "infoOptionSelection"
+                        : "infoOption"
+                    }`}
+                    onClick={() => setInfoType("জন্ম নিবন্ধন")}
+                  >
+                    জন্ম নিবন্ধন
+                  </div>
+                  <div
+                    className={`${
+                      infoType === "Passport"
+                        ? "infoOptionSelection"
+                        : "infoOption"
+                    }`}
+                    onClick={() => setInfoType("Passport")}
+                  >
+                    Passport
+                  </div>
+                </div>
               </div>
 
               <div>
-                Account Number : <b style={{ color: "red" }}>{accountNumber}</b>
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <QrCodeGenerator AccountNumber={accountNumber} />
-              </div>
-            </StickyBox>
-          </div>
-
-          <div className="col-8">
-            <div className="mb-3">
-              <label for="userName" className="form-label">
-                Name
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                id="userName"
-                aria-describedby="emailHelp"
-              />
-            </div>
-            <div className="infoTypeContainerBox">
-              <div className="infoTypeContainer">
-                <div
-                  className={`${
-                    infoType === "NID" ? "infoOptionSelection" : "infoOption"
-                  }`}
-                  onClick={() => setInfoType("NID")}
-                >
-                  NID
-                </div>
-                <div
-                  className={`${
-                    infoType === "জন্ম নিবন্ধন"
-                      ? "infoOptionSelection"
-                      : "infoOption"
-                  }`}
-                  onClick={() => setInfoType("জন্ম নিবন্ধন")}
-                >
-                  জন্ম নিবন্ধন
-                </div>
-                <div
-                  className={`${
-                    infoType === "Passport"
-                      ? "infoOptionSelection"
-                      : "infoOption"
-                  }`}
-                  onClick={() => setInfoType("Passport")}
-                >
-                  Passport
-                </div>
-              </div>
-            </div>
-
-            <div>
-              {infoType === "NID" && (
                 <div className="row mt-2">
                   <div className="col-6">
                     <div className="mb-3">
                       <label for="userName" className="form-label">
-                        NID Number
+                        {infoType === "NID" && "NID Number"}
+                        {infoType === "জন্ম নিবন্ধন" && "জন্ম নিবন্ধন Number"}
+                        {infoType === "Passport" && "Passport Number"}
                       </label>
                       <input
-                        type="email"
+                        onChange={(e) => setUserIdNumber(e.target.value)}
+                        type="text"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="idNumber"
                       />
                     </div>
                   </div>
@@ -151,6 +320,7 @@ export default function AddUser() {
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            onChange={(e) => setUserDate(e.target.value)}
                           >
                             <option selected>Day</option>
                             <option value="1">1</option>
@@ -192,6 +362,7 @@ export default function AddUser() {
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            onChange={(e) => setUserMonth(e.target.value)}
                           >
                             <option selected>Month</option>
                             <option value="January">January</option>
@@ -214,6 +385,7 @@ export default function AddUser() {
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            onChange={(e) => setUserYear(e.target.value)}
                           >
                             <option selected>Year</option>
                             <option value="">year</option>
@@ -312,10 +484,11 @@ export default function AddUser() {
                         Father's name
                       </label>
                       <input
-                        type="email"
+                        onChange={(e) => setUserFathersName(e.target.value)}
+                        type="text"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="fathersName"
                       />
                     </div>
                   </div>
@@ -325,10 +498,11 @@ export default function AddUser() {
                         Mother's name
                       </label>
                       <input
-                        type="email"
+                        type="text"
+                        onChange={(e) => setUserMothersName(e.target.value)}
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="mothersName"
                       />
                     </div>
                   </div>
@@ -338,10 +512,13 @@ export default function AddUser() {
                         Primary Phone Number
                       </label>
                       <input
-                        type="email"
+                        onChange={(e) =>
+                          setUserPrimaryPhoneNumber(e.target.value)
+                        }
+                        type="number"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="1stPhone"
                       />
                     </div>
                   </div>
@@ -351,10 +528,13 @@ export default function AddUser() {
                         Secondary Phone Number (Optional)
                       </label>
                       <input
-                        type="email"
+                        onChange={(e) =>
+                          setUserSecondaryPhoneNumber(e.target.value)
+                        }
+                        type="number"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="2ndPhone"
                       />
                     </div>
                   </div>
@@ -364,95 +544,371 @@ export default function AddUser() {
                         Email (Optional)
                       </label>
                       <input
-                        type="password"
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        type="email"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="email"
                       />
                     </div>
                   </div>
-                  <div>
+                  <div className="col-6">
+                    <div className="mb-3">
+                      <label for="userName" className="form-label">
+                        গ্রাম
+                      </label>
+                      <input
+                        onChange={(e) => setUserVillage(e.target.value)}
+                        type="text"
+                        className="form-control"
+                        id="userName"
+                        aria-describedby="village"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="mb-3">
+                      <label for="userName" className="form-label">
+                        ইউনিয়ন
+                      </label>
+                      <input
+                        onChange={(e) => setUserUnion(e.target.value)}
+                        type="text"
+                        className="form-control"
+                        id="userName"
+                        aria-describedby="Union"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="mb-3">
+                      <label for="userName" className="form-label">
+                        থানা
+                      </label>
+                      <input
+                        onChange={(e) => setUserThana(e.target.value)}
+                        type="text"
+                        className="form-control"
+                        id="userName"
+                        aria-describedby="thana"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="mb-3">
+                      <label for="userName" className="form-label">
+                        জেলা
+                      </label>
+                      <input
+                        onChange={(e) => setUserZela(e.target.value)}
+                        type="text"
+                        className="form-control"
+                        id="userName"
+                        aria-describedby="jela"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="mb-3">
+                      <label for="userName" className="form-label">
+                        Credit (TK)
+                      </label>
+                      <input
+                        onChange={(e) => setUserCredit(e.target.value)}
+                        type="number"
+                        className="form-control"
+                        id="userName"
+                        aria-describedby="Credit"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
                     <div className="mb-3">
                       <label for="userName" className="form-label">
                         Pin
                       </label>
                       <input
+                        onChange={(e) => setUserPin(e.target.value)}
                         type="password"
                         className="form-control"
                         id="userName"
-                        aria-describedby="emailHelp"
+                        aria-describedby="pin"
                       />
                     </div>
                   </div>
-                  <div>
-                    <Button onClick={() => submitBtn()} variant="contained">
-                      Create New Member
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div>
-              <div className="mt-4" style={{ textAlign: "center" }}>
-                <h1>PDF</h1>
-              </div>
-              <div
-                className=""
-                style={{
-                  width: "100%",
-                  border: "1px solid gray",
-                  borderRadius: "5px",
-                }}
-              >
-                <div ref={componentRef} className="p-2">
-                  <div style={{ textAlign: "center" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Voluptate, dicta?
-                    <img
-                      className="w-50 mt-3"
-                      style={{ borderRadius: "5px" }}
-                      src={
-                        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAB0CAYAAABUmhYnAAAAAXNSR0IArs4c6QAABJ5JREFUeF7tnduOYjEMBIf//+hZad84SJRa7RxIpvbVuThdtnNhYB+/v7+/P/47RoGHQI9h+X8hAj2Lp0AP4ylQgZ6mwGHrcQ8V6GEKHLYcM1Sghylw2HLMUIEepsBhyzFDBXqYAoctxwwV6GEKHLacOkMfj8etklw/vqX5qT19HEzjTy+e/KH5BAqf7wuUQqi0U8Zdh6f2lBECLYFRdwIkUApRUPgaweVwL7O146cZRgHzbeu7Cja+h37bggVKNe9ibzOIpmvHFygpLNBQoffN24C9veTenSEkENlfBLrcs2mPJdrUv92ylu+hAn1GLFDIkDajKCMoo+8OWKoAZmj4UkQZRoJTfwowGn97oJRBaQan7c1QCLE0ggX6LKgZasm9RMSHj/Vm6OEZSocGsrclf3p8Gu+4h4X0UEICCfTLSi4BI7tABUox8mRPAyYafOIb3OmhJHYwDJj0Yk7+kz1dT3rPTcdffm1JHUoX3ApO/cm+en3p+AJdXAEIyHTACFSg7x8WKCJbe3qooAxI7a3/1D89Ayy/h5LDrV2g7xUcL7ktMOovUIFW98Dpl6g0YKn9eMlNJ5xuT3vg9HzfPl5dcj+9QIFeDqm7/3ijQAX66aKydP665LYZQv3TQ0l7Cp5Wm+6VtP7UH4Eu/sKyQC9/42OGZjlqhpqh8FIBAlEJongc33NCoKn/5C/ZSY/lDwtUIlNBXhwOvxpBgpC/1/6p/wSM7OS/QC8KCBRChgRKI9wMzXK0PhRl0/38pCXm29pTgLUlOtVzecklh74NUOqPQGHPohKcCr66vUAFSkVr1F7voe0hqM2odM9q/SX12/VQxcL524/PWoFaAQT6rIAZeomIOkPCh480oM3Q8CHhzwPFiAkjlk6R0593EsDxDFr91t3uoQIlBS57nECffzHbDH0fQPWhiOKzLVnUP7W3p2Iq0akeqT84/uqSSw60dro2teOPC16eKWg9yzOUHGjtAh2+h7ZA2v4CFWgVQ9N7aDveyzWv3UM/nSF0KErvtdSeoiE9hdN4qb3eQwX6LLlAwxBsBWszmtxt/aPxyW6Ghj/eSIIeB3R8kw/vbWkGEqDWTlvSuF7Th6JxBwUaxdR4yRXo5V64+DF++bVFoIcDpT2E3kppT5y2p/607al/VG/v+PFGgWb/YW5b4ZbvoQIV6FOVmS6pdE+kEkgBmo5P8/25kksLTgOCxiNgVDLTgCB/bj/l0gIoQgkILZj63+0fzUcBgetd/bBACxDo+8d9AmiG3vyjHC+CL35o2P6USxGcllwqeW3FIX9bu0DLt2ICQAFC/VO7QAX6/q2SjvUUcdQ/jXhLLil+sZNg4XAvzafHpz2QAmban1af20+5rcPTAgoUiEwLTsd8yiAKIIEK9EmB1QFMAUn28VMuTdja00NTmpHUPn3ZStvXFWj66a8FRv0F+l4hM3TxU6AZCilqhi7OUCqR2u9VoC6597rrbKSAQEmhzewC3QwYuStQUmgzu0A3A0buCpQU2swu0M2AkbsCJYU2swt0M2DkrkBJoc3sAt0MGLkrUFJoM7tANwNG7gqUFNrMLtDNgJG7/wBpSCcOWoLSmgAAAABJRU5ErkJggg=="
-                      }
-                      alt=""
-                    />
-                    <h4>Jubayth Hossen </h4>
-                  </div>
-                  <div>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Illum sint totam rerum libero quidem, repellendus quaerat
-                    enim expedita reprehenderit similique!
-                  </div>
-                  <div>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Illum sint totam rerum libero quidem, repellendus quaerat
-                    enim expedita reprehenderit similique!
-                  </div>
-                  <div>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Illum sint totam rerum libero quidem, repellendus quaerat
-                    enim expedita reprehenderit similique!
-                  </div>
-                  <div>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Illum sint totam rerum libero quidem, repellendus quaerat
-                    enim expedita reprehenderit similique!
-                  </div>
-                  <div>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                    Illum sint totam rerum libero quidem, repellendus quaerat
-                    enim expedita reprehenderit similique!
+                  {error.state === true && (
+                    <div>
+                      <div className="alert alert-danger" role="alert">
+                        {error.message}
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ textAlign: "right" }}>
+                    {loading === true ? (
+                      <Button variant="contained">Loading...</Button>
+                    ) : (
+                      <Button onClick={() => submitBtn()} variant="contained">
+                        Create New Member
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
-              <ReactToPrint
-                trigger={() => <button>Print this out!</button>}
-                content={() => componentRef.current}
-              />
+              <div>
+                <div className="mt-4" style={{ textAlign: "center" }}>
+                  <h1>PDF</h1>
+                </div>
+                <div
+                  className=""
+                  style={{
+                    width: "100%",
+                    border: "1px solid gray",
+                    borderRadius: "5px",
+                  }}
+                >
+                  <div ref={componentRef} className="p-2">
+                    <div style={{ textAlign: "center" }}>
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Voluptate, dicta?
+                      <img
+                        className="w-50 mt-3"
+                        style={{ borderRadius: "5px" }}
+                        src={
+                          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAB0CAYAAABUmhYnAAAAAXNSR0IArs4c6QAABJ5JREFUeF7tnduOYjEMBIf//+hZad84SJRa7RxIpvbVuThdtnNhYB+/v7+/P/47RoGHQI9h+X8hAj2Lp0AP4ylQgZ6mwGHrcQ8V6GEKHLYcM1Sghylw2HLMUIEepsBhyzFDBXqYAoctxwwV6GEKHLacOkMfj8etklw/vqX5qT19HEzjTy+e/KH5BAqf7wuUQqi0U8Zdh6f2lBECLYFRdwIkUApRUPgaweVwL7O146cZRgHzbeu7Cja+h37bggVKNe9ibzOIpmvHFygpLNBQoffN24C9veTenSEkENlfBLrcs2mPJdrUv92ylu+hAn1GLFDIkDajKCMoo+8OWKoAZmj4UkQZRoJTfwowGn97oJRBaQan7c1QCLE0ggX6LKgZasm9RMSHj/Vm6OEZSocGsrclf3p8Gu+4h4X0UEICCfTLSi4BI7tABUox8mRPAyYafOIb3OmhJHYwDJj0Yk7+kz1dT3rPTcdffm1JHUoX3ApO/cm+en3p+AJdXAEIyHTACFSg7x8WKCJbe3qooAxI7a3/1D89Ayy/h5LDrV2g7xUcL7ktMOovUIFW98Dpl6g0YKn9eMlNJ5xuT3vg9HzfPl5dcj+9QIFeDqm7/3ijQAX66aKydP665LYZQv3TQ0l7Cp5Wm+6VtP7UH4Eu/sKyQC9/42OGZjlqhpqh8FIBAlEJongc33NCoKn/5C/ZSY/lDwtUIlNBXhwOvxpBgpC/1/6p/wSM7OS/QC8KCBRChgRKI9wMzXK0PhRl0/38pCXm29pTgLUlOtVzecklh74NUOqPQGHPohKcCr66vUAFSkVr1F7voe0hqM2odM9q/SX12/VQxcL524/PWoFaAQT6rIAZeomIOkPCh480oM3Q8CHhzwPFiAkjlk6R0593EsDxDFr91t3uoQIlBS57nECffzHbDH0fQPWhiOKzLVnUP7W3p2Iq0akeqT84/uqSSw60dro2teOPC16eKWg9yzOUHGjtAh2+h7ZA2v4CFWgVQ9N7aDveyzWv3UM/nSF0KErvtdSeoiE9hdN4qb3eQwX6LLlAwxBsBWszmtxt/aPxyW6Ghj/eSIIeB3R8kw/vbWkGEqDWTlvSuF7Th6JxBwUaxdR4yRXo5V64+DF++bVFoIcDpT2E3kppT5y2p/607al/VG/v+PFGgWb/YW5b4ZbvoQIV6FOVmS6pdE+kEkgBmo5P8/25kksLTgOCxiNgVDLTgCB/bj/l0gIoQgkILZj63+0fzUcBgetd/bBACxDo+8d9AmiG3vyjHC+CL35o2P6USxGcllwqeW3FIX9bu0DLt2ICQAFC/VO7QAX6/q2SjvUUcdQ/jXhLLil+sZNg4XAvzafHpz2QAmban1af20+5rcPTAgoUiEwLTsd8yiAKIIEK9EmB1QFMAUn28VMuTdja00NTmpHUPn3ZStvXFWj66a8FRv0F+l4hM3TxU6AZCilqhi7OUCqR2u9VoC6597rrbKSAQEmhzewC3QwYuStQUmgzu0A3A0buCpQU2swu0M2AkbsCJYU2swt0M2DkrkBJoc3sAt0MGLkrUFJoM7tANwNG7gqUFNrMLtDNgJG7/wBpSCcOWoLSmgAAAABJRU5ErkJggg=="
+                        }
+                        alt=""
+                      />
+                      <h4>Jubayth Hossen </h4>
+                    </div>
+                    <div>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Illum sint totam rerum libero quidem, repellendus quaerat
+                      enim expedita reprehenderit similique!
+                    </div>
+                    <div>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Illum sint totam rerum libero quidem, repellendus quaerat
+                      enim expedita reprehenderit similique!
+                    </div>
+                    <div>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Illum sint totam rerum libero quidem, repellendus quaerat
+                      enim expedita reprehenderit similique!
+                    </div>
+                    <div>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Illum sint totam rerum libero quidem, repellendus quaerat
+                      enim expedita reprehenderit similique!
+                    </div>
+                    <div>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Illum sint totam rerum libero quidem, repellendus quaerat
+                      enim expedita reprehenderit similique!
+                    </div>
+                  </div>
+                </div>
+                <ReactToPrint
+                  trigger={() => <button>Print this out!</button>}
+                  content={() => componentRef.current}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div>
+          <div className="p-5">
+            <div className="p-2 border">
+              <div>
+                <div className="d-flex justify-content-center">
+                  <h2 className="mt-3">
+                    <b>
+                      তুফা অ্যান্ড সোফা{" "}
+                      <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
+                    </b>
+                  </h2>
+                </div>
+
+                <div className="d-flex justify-content-center">
+                  <h5>Phone : 01877134731</h5>
+                </div>
+                <div className="d-flex justify-content-center">
+                  <div>
+                    <span>Card Details</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-2 mt-3">
+                <div className="  row">
+                  <div className="col-10">
+                    <div>
+                      <h5>
+                        <b style={{ color: "red" }}>ব্যক্তিগত তথ্য :</b>{" "}
+                      </h5>
+                    </div>
+                    <div style={{ marginLeft: "15px" }}>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">nam</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <h5>
+                        <b style={{ color: "red" }}>পারিবারিক তথ্য :</b>{" "}
+                      </h5>
+                    </div>
+                    <div style={{ marginLeft: "15px" }}>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">nam</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <h5>
+                        <b style={{ color: "red" }}>ঠিকানা :</b>{" "}
+                      </h5>
+                    </div>
+                    <div style={{ marginLeft: "15px" }}>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">nam</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <h5>
+                        <b style={{ color: "red" }}>
+                          অ্যাকাউন্ট সংক্রান্ত তথ্য :
+                        </b>{" "}
+                      </h5>
+                    </div>
+                    <div style={{ marginLeft: "15px" }}>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">nam</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-2">নাম</div>
+                        <div className="col-6">
+                          : <b>রনি আহমেদ</b>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-2">
+                    <div>
+                      <img
+                        style={{ borderRadius: "10px" }}
+                        src={inputImage}
+                        alt=""
+                        className="w-100"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AddUserStyle>
   );
 }

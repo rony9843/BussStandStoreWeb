@@ -1,7 +1,6 @@
-import QRCode from "qrcode";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-export default function QrCodeGenerator({ AccountNumber }) {
+export default function QrCodeGenerator({ QrCodeImg }) {
   /**
      * 
         <input
@@ -11,22 +10,6 @@ export default function QrCodeGenerator({ AccountNumber }) {
           onChange={(e) => setQrCodeInput(e.target.value)}
         />
      */
-
-  const [QrCodeImg, setQrCodeImg] = useState();
-
-  const generateQrCode = async (props) => {
-    try {
-      const res = await QRCode.toDataURL(`"${props}"`);
-      console.log(res);
-      setQrCodeImg(res);
-    } catch (error) {
-      console.log("error for qrcode ", error);
-    }
-  };
-
-  useEffect(() => {
-    generateQrCode(AccountNumber);
-  }, [AccountNumber]);
 
   return (
     <div>
