@@ -17,7 +17,7 @@
     "react": "^18.2.0",
     "react-barcode": "^1.4.6",
     "react-dom": "^18.2.0",
-    "react-qr-reader": "^3.0.0-beta-1",
+  
     "react-qrcode-reader": "^2.0.0",
     "react-scripts": "5.0.1",
     "react-sticky-box": "^2.0.4",
@@ -26,7 +26,16 @@
     "socket.io-client": "^4.6.1",
     "styled-component": "^2.8.0",
     "styled-components": "^6.0.0-rc.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+
+
+    "barcode-react-scanner": "1.2.0",
+ 
+  
+    "react-qr-reader": "^2.2.1",
+    "react-qr-scanner": "1.0.0-alpha.7"
+
+
   },
   "scripts": {
     "predeploy": "npm run build",

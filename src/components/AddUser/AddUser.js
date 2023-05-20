@@ -1,17 +1,31 @@
 import Button from "@mui/material/Button";
 import QRCode from "qrcode";
 import React, { useEffect, useRef, useState } from "react";
-import QrCodeReader from "react-qrcode-reader";
+import QrReader from "react-qr-reader";
 import StickyBox from "react-sticky-box";
 import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
 
 export default function AddUser({ optionSelection }) {
-  const [val, setVal] = useState("");
+  const [selected, setSelected] = useState("environment");
+  const [startScan, setStartScan] = useState(false);
+  const [loadingScan, setLoadingScan] = useState(false);
+  const [data, setData] = useState("");
 
-  const handleRead = (code) => {
-    setVal(code);
+  const handleScan = async (scanData) => {
+    setLoadingScan(true);
+    console.log(`loaded data data`, scanData);
+    if (scanData && scanData !== "") {
+      console.log(`loaded >>>`, scanData);
+      setData(scanData);
+      setStartScan(false);
+      setLoadingScan(false);
+      // setPrecScan(scanData);
+    }
+  };
+  const handleError = (err) => {
+    console.error(err);
   };
 
   const componentRef = useRef();
@@ -211,13 +225,31 @@ export default function AddUser({ optionSelection }) {
         <div className="p-2">
           <h3>Add User</h3>
           <div>
-            <QrCodeReader
-              delay={100}
-              width={500}
-              height={500}
-              onRead={handleRead}
-            />
-            <p>tttt - {val}</p>
+            <button
+              onClick={() => {
+                setStartScan(!startScan);
+              }}
+            >
+              {startScan ? "Stop Scan" : "Start Scan"}
+            </button>
+            {startScan && (
+              <>
+                <select onChange={(e) => setSelected(e.target.value)}>
+                  <option value={"environment"}>Back Camera</option>
+                  <option value={"user"}>Front Camera</option>
+                </select>
+                <QrReader
+                  facingMode={selected}
+                  delay={1000}
+                  onError={handleError}
+                  onScan={handleScan}
+                  // chooseDeviceId={()=>selected}
+                  style={{ width: "300px" }}
+                />
+              </>
+            )}
+            {loadingScan && <p>Loading</p>}
+            {data !== "" && <p>{data}</p>}
           </div>
           <div className="row w-100">
             <div className="col-4">
