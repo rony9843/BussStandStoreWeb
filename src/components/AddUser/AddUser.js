@@ -1,12 +1,15 @@
 import Button from "@mui/material/Button";
 import QRCode from "qrcode";
 import React, { useEffect, useRef, useState } from "react";
+import { QrReader } from "react-qr-reader";
 import StickyBox from "react-sticky-box";
 import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
 
 export default function AddUser({ optionSelection }) {
+  const [data, setData] = useState("No result");
+
   const componentRef = useRef();
 
   const [userImage, setUserImage] = useState(
@@ -203,6 +206,24 @@ export default function AddUser({ optionSelection }) {
       {pageMode === "create" ? (
         <div className="p-2">
           <h3>Add User</h3>
+          <div>
+            <div>
+              <QrReader
+                onResult={(result, error) => {
+                  if (!!result) {
+                    setData(result?.text);
+                  }
+
+                  if (!!error) {
+                    console.info(error);
+                  }
+                }}
+                style={{ width: "100%" }}
+              />
+
+              <p>{data}</p>
+            </div>
+          </div>
           <div className="row w-100">
             <div className="col-4">
               <StickyBox offsetTop={20} offsetBottom={20}>
@@ -655,256 +676,188 @@ export default function AddUser({ optionSelection }) {
                   </div>
                 </div>
               </div>
-              <div>
-                <div className="mt-4" style={{ textAlign: "center" }}>
-                  <h1>PDF</h1>
-                </div>
-                <div
-                  className=""
-                  style={{
-                    width: "100%",
-                    border: "1px solid gray",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <div ref={componentRef} className="p-2">
-                    <div style={{ textAlign: "center" }}>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Voluptate, dicta?
-                      <img
-                        className="w-50 mt-3"
-                        style={{ borderRadius: "5px" }}
-                        src={
-                          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAB0CAYAAABUmhYnAAAAAXNSR0IArs4c6QAABJ5JREFUeF7tnduOYjEMBIf//+hZad84SJRa7RxIpvbVuThdtnNhYB+/v7+/P/47RoGHQI9h+X8hAj2Lp0AP4ylQgZ6mwGHrcQ8V6GEKHLYcM1Sghylw2HLMUIEepsBhyzFDBXqYAoctxwwV6GEKHLacOkMfj8etklw/vqX5qT19HEzjTy+e/KH5BAqf7wuUQqi0U8Zdh6f2lBECLYFRdwIkUApRUPgaweVwL7O146cZRgHzbeu7Cja+h37bggVKNe9ibzOIpmvHFygpLNBQoffN24C9veTenSEkENlfBLrcs2mPJdrUv92ylu+hAn1GLFDIkDajKCMoo+8OWKoAZmj4UkQZRoJTfwowGn97oJRBaQan7c1QCLE0ggX6LKgZasm9RMSHj/Vm6OEZSocGsrclf3p8Gu+4h4X0UEICCfTLSi4BI7tABUox8mRPAyYafOIb3OmhJHYwDJj0Yk7+kz1dT3rPTcdffm1JHUoX3ApO/cm+en3p+AJdXAEIyHTACFSg7x8WKCJbe3qooAxI7a3/1D89Ayy/h5LDrV2g7xUcL7ktMOovUIFW98Dpl6g0YKn9eMlNJ5xuT3vg9HzfPl5dcj+9QIFeDqm7/3ijQAX66aKydP665LYZQv3TQ0l7Cp5Wm+6VtP7UH4Eu/sKyQC9/42OGZjlqhpqh8FIBAlEJongc33NCoKn/5C/ZSY/lDwtUIlNBXhwOvxpBgpC/1/6p/wSM7OS/QC8KCBRChgRKI9wMzXK0PhRl0/38pCXm29pTgLUlOtVzecklh74NUOqPQGHPohKcCr66vUAFSkVr1F7voe0hqM2odM9q/SX12/VQxcL524/PWoFaAQT6rIAZeomIOkPCh480oM3Q8CHhzwPFiAkjlk6R0593EsDxDFr91t3uoQIlBS57nECffzHbDH0fQPWhiOKzLVnUP7W3p2Iq0akeqT84/uqSSw60dro2teOPC16eKWg9yzOUHGjtAh2+h7ZA2v4CFWgVQ9N7aDveyzWv3UM/nSF0KErvtdSeoiE9hdN4qb3eQwX6LLlAwxBsBWszmtxt/aPxyW6Ghj/eSIIeB3R8kw/vbWkGEqDWTlvSuF7Th6JxBwUaxdR4yRXo5V64+DF++bVFoIcDpT2E3kppT5y2p/607al/VG/v+PFGgWb/YW5b4ZbvoQIV6FOVmS6pdE+kEkgBmo5P8/25kksLTgOCxiNgVDLTgCB/bj/l0gIoQgkILZj63+0fzUcBgetd/bBACxDo+8d9AmiG3vyjHC+CL35o2P6USxGcllwqeW3FIX9bu0DLt2ICQAFC/VO7QAX6/q2SjvUUcdQ/jXhLLil+sZNg4XAvzafHpz2QAmban1af20+5rcPTAgoUiEwLTsd8yiAKIIEK9EmB1QFMAUn28VMuTdja00NTmpHUPn3ZStvXFWj66a8FRv0F+l4hM3TxU6AZCilqhi7OUCqR2u9VoC6597rrbKSAQEmhzewC3QwYuStQUmgzu0A3A0buCpQU2swu0M2AkbsCJYU2swt0M2DkrkBJoc3sAt0MGLkrUFJoM7tANwNG7gqUFNrMLtDNgJG7/wBpSCcOWoLSmgAAAABJRU5ErkJggg=="
-                        }
-                        alt=""
-                      />
-                      <h4>Jubayth Hossen </h4>
-                    </div>
-                    <div>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Illum sint totam rerum libero quidem, repellendus quaerat
-                      enim expedita reprehenderit similique!
-                    </div>
-                    <div>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Illum sint totam rerum libero quidem, repellendus quaerat
-                      enim expedita reprehenderit similique!
-                    </div>
-                    <div>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Illum sint totam rerum libero quidem, repellendus quaerat
-                      enim expedita reprehenderit similique!
-                    </div>
-                    <div>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Illum sint totam rerum libero quidem, repellendus quaerat
-                      enim expedita reprehenderit similique!
-                    </div>
-                    <div>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Illum sint totam rerum libero quidem, repellendus quaerat
-                      enim expedita reprehenderit similique!
-                    </div>
-                  </div>
-                </div>
-                <ReactToPrint
-                  trigger={() => <button>Print this out!</button>}
-                  content={() => componentRef.current}
-                />
-              </div>
             </div>
           </div>
         </div>
       ) : (
         <div>
-          <div className="p-5">
+          <div className="p-5 m-5">
             <div className="p-2 border">
-              <div>
-                <div className="d-flex justify-content-center">
-                  <h2 className="mt-3">
-                    <b>
-                      তুফা অ্যান্ড সোফা{" "}
-                      <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
-                    </b>
-                  </h2>
-                </div>
+              <div ref={componentRef} className="p-5">
+                <div>
+                  <div className="d-flex justify-content-center">
+                    <h2 className="mt-3">
+                      <b>
+                        তোফা এন্ড সুফা{" "}
+                        <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
+                      </b>
+                    </h2>
+                  </div>
 
-                <div className="d-flex justify-content-center">
-                  <h5>Phone : 01877134731</h5>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <span>Card Details</span>
+                  <div className="d-flex justify-content-center">
+                    <h5> ফোন : ০১৮৭৭১৩৪৭৩১</h5>
                   </div>
-                </div>
-              </div>
-              <div className="p-2 mt-3">
-                <div className="  row">
-                  <div className="col-10">
+                  <div className="d-flex justify-content-center">
                     <div>
-                      <h5>
-                        <b style={{ color: "red" }}>ব্যক্তিগত তথ্য :</b>{" "}
-                      </h5>
-                    </div>
-                    <div style={{ marginLeft: "15px" }}>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">nam</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <h5>
-                        <b style={{ color: "red" }}>পারিবারিক তথ্য :</b>{" "}
-                      </h5>
-                    </div>
-                    <div style={{ marginLeft: "15px" }}>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">nam</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <h5>
-                        <b style={{ color: "red" }}>ঠিকানা :</b>{" "}
-                      </h5>
-                    </div>
-                    <div style={{ marginLeft: "15px" }}>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">nam</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <h5>
-                        <b style={{ color: "red" }}>
-                          অ্যাকাউন্ট সংক্রান্ত তথ্য :
-                        </b>{" "}
-                      </h5>
-                    </div>
-                    <div style={{ marginLeft: "15px" }}>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">nam</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">নাম</div>
-                        <div className="col-6">
-                          : <b>রনি আহমেদ</b>
-                        </div>
-                      </div>
+                      <span>কার্ড সংক্রান্ত তথ্য</span>
                     </div>
                   </div>
-                  <div className="col-2">
-                    <div>
-                      <img
-                        style={{ borderRadius: "10px" }}
-                        src={inputImage}
-                        alt=""
-                        className="w-100"
-                      />
+                  <div
+                    className="
+                d-flex justify-content-center"
+                  >
+                    <hr style={{ width: "30%" }} />
+                  </div>
+                </div>
+                <div className="p-2 mt-3">
+                  <div className="  row">
+                    <div className="col-8">
+                      <div>
+                        <h5>
+                          <b style={{ color: "red" }}>ব্যক্তিগত তথ্য :</b>{" "}
+                        </h5>
+                      </div>
+                      <div style={{ marginLeft: "15px" }}>
+                        <div className="row">
+                          <div className="col-4">নাম</div>
+                          <div className="col-6">
+                            : <b>{userName}</b>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">
+                            {infoType === "NID" && "NID নম্বর"}
+                            {infoType === "জন্ম নিবন্ধন" &&
+                              "জন্ম নিবন্ধন নম্বর"}
+                            {infoType === "জন্ম নিবন্ধন" && "Passport নম্বর"}
+                          </div>
+                          <div className="col-6">
+                            : <b>{userIdNumber}</b>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">ইমেইল</div>
+                          <div className="col-6">
+                            : {userEmail === "" ? "নাই" : userEmail}
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">জন্ম তারিখ</div>
+                          <div className="col-6">
+                            : {userDate} / {userMonth} / {userYear}
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">প্রথমিক ফোন</div>
+                          <div className="col-6">
+                            : <b>{userPrimaryPhoneNumber}</b>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">দ্বিতীয় ফোন</div>
+                          <div className="col-6">
+                            :{" "}
+                            {userSecondaryPhoneNumber === ""
+                              ? "নাই"
+                              : userSecondaryPhoneNumber}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <h5>
+                          <b style={{ color: "red" }}>পারিবারিক তথ্য :</b>{" "}
+                        </h5>
+                      </div>
+                      <div style={{ marginLeft: "15px" }}>
+                        <div className="row">
+                          <div className="col-4">পিতার নাম</div>
+                          <div className="col-6">: {userFathersName}</div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">মাতার নাম</div>
+                          <div className="col-6">: {userMothersName}</div>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <h5>
+                          <b style={{ color: "red" }}>ঠিকানা :</b>{" "}
+                        </h5>
+                      </div>
+                      <div style={{ marginLeft: "15px" }}>
+                        <div className="row">
+                          <div className="col-4">গ্রাম</div>
+                          <div className="col-6">: {userVillage}</div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">ইউনিয়ন</div>
+                          <div className="col-6">: {userUnion}</div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">থানা</div>
+                          <div className="col-6">: {userThana}</div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">জেলা</div>
+                          <div className="col-6">: {userZela}</div>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <h5>
+                          <b style={{ color: "red" }}>
+                            অ্যাকাউন্ট সংক্রান্ত তথ্য :
+                          </b>{" "}
+                        </h5>
+                      </div>
+                      <div style={{ marginLeft: "15px" }}>
+                        <div className="row">
+                          <div className="col-4">ক্রেডিট</div>
+                          <div className="col-6">
+                            : <b>{userCredit} টাকা</b>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-4">অ্যাকাউন্ট নম্বর</div>
+                          <div className="col-6">
+                            : <b>{accountNumber}</b>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-4 ">
+                      <div>
+                        <img
+                          style={{ borderRadius: "10px" }}
+                          src={inputImage}
+                          alt=""
+                          className="w-100"
+                        />
+                      </div>
+                      <div className="mt-5 pt-5">
+                        <div>
+                          <img
+                            style={{ borderRadius: "10px" }}
+                            src={QrCodeImg}
+                            alt=""
+                            className="w-100"
+                          />
+                        </div>
+                        <div className="mt-2 d-flex justify-content-center">
+                          <h5>
+                            {" "}
+                            <b style={{ color: "red" }}>{accountNumber}</b>
+                          </h5>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+            <div>
+              <ReactToPrint
+                trigger={() => <button>Save Or Print</button>}
+                content={() => componentRef.current}
+              />
             </div>
           </div>
         </div>
