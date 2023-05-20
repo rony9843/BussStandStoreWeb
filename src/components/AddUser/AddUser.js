@@ -1,17 +1,20 @@
 import Button from "@mui/material/Button";
 import QRCode from "qrcode";
 import React, { useEffect, useRef, useState } from "react";
-import { QrReader } from "react-qr-reader";
+import QrCodeReader from "react-qrcode-reader";
 import StickyBox from "react-sticky-box";
 import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
 
 export default function AddUser({ optionSelection }) {
-  const [data, setData] = useState("No result");
+  const [val, setVal] = useState("");
+
+  const handleRead = (code) => {
+    setVal(code);
+  };
 
   const componentRef = useRef();
-  const qrRef = useRef(null);
 
   const [userImage, setUserImage] = useState(
     "https://i.ibb.co/zSXHJ2M/blank-profile-picture-gbaab5039d-1280.png"
@@ -208,25 +211,13 @@ export default function AddUser({ optionSelection }) {
         <div className="p-2">
           <h3>Add User</h3>
           <div>
-            <div>
-              <QrReader
-                ref={qrRef}
-                delay={300}
-                style={{ width: "100%" }}
-                onResult={(result, error) => {
-                  if (!!result) {
-                    setData(result?.text);
-                  }
-
-                  if (!!error) {
-                    console.info(error);
-                  }
-                }}
-                legacyMode
-              />
-
-              <p>{data}</p>
-            </div>
+            <QrCodeReader
+              delay={100}
+              width={500}
+              height={500}
+              onRead={handleRead}
+            />
+            <p>tttt - {val}</p>
           </div>
           <div className="row w-100">
             <div className="col-4">
