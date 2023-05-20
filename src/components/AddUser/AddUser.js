@@ -209,6 +209,7 @@ export default function AddUser({ optionSelection }) {
           <div>
             <div>
               <QrReader
+                legacyMode
                 onResult={(result, error) => {
                   if (!!result) {
                     setData(result?.text);
