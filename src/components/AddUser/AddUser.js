@@ -11,6 +11,7 @@ export default function AddUser({ optionSelection }) {
   const [data, setData] = useState("No result");
 
   const componentRef = useRef();
+  const qrRef = useRef(null);
 
   const [userImage, setUserImage] = useState(
     "https://i.ibb.co/zSXHJ2M/blank-profile-picture-gbaab5039d-1280.png"
@@ -209,7 +210,9 @@ export default function AddUser({ optionSelection }) {
           <div>
             <div>
               <QrReader
-                legacyMode
+                ref={qrRef}
+                delay={300}
+                style={{ width: "100%" }}
                 onResult={(result, error) => {
                   if (!!result) {
                     setData(result?.text);
@@ -219,7 +222,7 @@ export default function AddUser({ optionSelection }) {
                     console.info(error);
                   }
                 }}
-                style={{ width: "100%" }}
+                legacyMode
               />
 
               <p>{data}</p>
