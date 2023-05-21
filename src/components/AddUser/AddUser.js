@@ -7,7 +7,7 @@ import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
 
-export default function AddUser({ optionSelection }) {
+export default function AddUser({ optionSelection, socket }) {
   const [selected, setSelected] = useState("environment");
   const [startScan, setStartScan] = useState(false);
   const [loadingScan, setLoadingScan] = useState(false);
@@ -27,6 +27,23 @@ export default function AddUser({ optionSelection }) {
   const handleError = (err) => {
     console.error(err);
   };
+
+  const [qrCodeStateCon, setQrCodeStateCon] = useState(false);
+
+  // qrcode socket io
+  const qrCodeSocketIo = () => {
+    socket.emit("QrCodeState", qrCodeStateCon);
+  };
+
+  useEffect(() => {
+    socket.on("QrCodeStateResponse", (data) => setQrCodeStateCon(data));
+  }, [socket]);
+
+  const [barCodeItem, setBarCodeItems] = useState([]);
+
+  useEffect(() => {
+    socket.on("orderItemList", (data) => setBarCodeItems(data));
+  }, [socket]);
 
   const componentRef = useRef();
 
@@ -224,6 +241,18 @@ export default function AddUser({ optionSelection }) {
       {pageMode === "create" ? (
         <div className="p-2">
           <h3>Add User</h3>
+          <div>
+            <div>
+              <button onClick={() => qrCodeSocketIo()}>
+                QrCode socketIo --{qrCodeStateCon === false ? "false" : "true"}
+              </button>
+            </div>
+            <div>
+              {barCodeItem.map((dt) => (
+                <div>{dt.data}</div>
+              ))}
+            </div>
+          </div>
           <div>
             <button
               onClick={() => {

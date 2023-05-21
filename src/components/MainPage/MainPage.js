@@ -5,7 +5,10 @@ import MainRightSide from "./MainRightSide";
 
 export default function MainPage() {
   const [optionSelection, setOptionSelection] = useState("Add User");
-  const socket = socketIO.connect("http://localhost:5500/");
+  const socket = socketIO.connect(
+    "https://bussstandstoresocketio-production.up.railway.app/"
+  );
+  // const socket = socketIO.connect("http://localhost:5500/");
 
   const handleSubmit = () => {
     //sends the username and socket ID to the Node.js server
@@ -33,7 +36,10 @@ export default function MainPage() {
           ></MainLeftSide>
         </div>
         <div style={{ width: "85%", height: "100vh", overflowY: "scroll" }}>
-          <MainRightSide optionSelection={optionSelection}></MainRightSide>
+          <MainRightSide
+            socket={socket}
+            optionSelection={optionSelection}
+          ></MainRightSide>
         </div>
       </div>
     </div>
