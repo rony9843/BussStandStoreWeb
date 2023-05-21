@@ -11,7 +11,7 @@ export default function RegisterPage({ setPageState }) {
   const [pass, setPass] = useState("");
 
   const submitBtn = () => {
-    if (email === "masumkaka223@gmail.com" && pass === "masumkaka111") {
+    if (email === "masomkaka223@gmail.com" && pass === "masomkaka111") {
       setPageState("Main");
     } else {
       setError({
