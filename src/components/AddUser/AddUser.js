@@ -1,11 +1,12 @@
 import Button from "@mui/material/Button";
 import QRCode from "qrcode";
 import React, { useEffect, useRef, useState } from "react";
-import QrReader from "react-qr-reader";
 import StickyBox from "react-sticky-box";
 import ReactToPrint from "react-to-print";
 import { styled } from "styled-components";
+import handshakeIcon from "../../asset/handshake.png";
 import QrCodeGenerator from "../QrCodeGenerator/QrCodeGenerator";
+import UserCard from "./UserCard";
 
 export default function AddUser({ optionSelection, socket }) {
   const [selected, setSelected] = useState("environment");
@@ -30,10 +31,10 @@ export default function AddUser({ optionSelection, socket }) {
 
   const [qrCodeStateCon, setQrCodeStateCon] = useState(false);
 
-  // qrcode socket io
-  const qrCodeSocketIo = () => {
-    socket.emit("QrCodeState", qrCodeStateCon);
-  };
+  // !! qrcode socket io
+  // const qrCodeSocketIo = () => {
+  //   socket.emit("QrCodeState", qrCodeStateCon);
+  // };
 
   useEffect(() => {
     socket.on("QrCodeStateResponse", (data) => setQrCodeStateCon(data));
@@ -46,6 +47,8 @@ export default function AddUser({ optionSelection, socket }) {
   }, [socket]);
 
   const componentRef = useRef();
+  const componentCardRef = useRef();
+  const componentCardNoImageRef = useRef();
 
   const [userImage, setUserImage] = useState(
     "https://i.ibb.co/zSXHJ2M/blank-profile-picture-gbaab5039d-1280.png"
@@ -207,13 +210,16 @@ export default function AddUser({ optionSelection, socket }) {
       };
       setLoading(true);
 
-      fetch("http://localhost:9990/createUser", {
-        method: "POST", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
+      fetch(
+        "https://bussstandstoreserver-production.up.railway.app/createUser",
+        {
+          method: "POST", // or 'PUT'
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      )
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
@@ -243,7 +249,7 @@ export default function AddUser({ optionSelection, socket }) {
           <h3>Add User</h3>
           <div>
             <div>
-              <button onClick={() => qrCodeSocketIo()}>
+              <button>
                 QrCode socketIo --{qrCodeStateCon === false ? "false" : "true"}
               </button>
             </div>
@@ -253,33 +259,7 @@ export default function AddUser({ optionSelection, socket }) {
               ))}
             </div>
           </div>
-          <div>
-            <button
-              onClick={() => {
-                setStartScan(!startScan);
-              }}
-            >
-              {startScan ? "Stop Scan" : "Start Scan"}
-            </button>
-            {startScan && (
-              <>
-                <select onChange={(e) => setSelected(e.target.value)}>
-                  <option value={"environment"}>Back Camera</option>
-                  <option value={"user"}>Front Camera</option>
-                </select>
-                <QrReader
-                  facingMode={selected}
-                  delay={1000}
-                  onError={handleError}
-                  onScan={handleScan}
-                  // chooseDeviceId={()=>selected}
-                  style={{ width: "300px" }}
-                />
-              </>
-            )}
-            {loadingScan && <p>Loading</p>}
-            {data !== "" && <p>{data}</p>}
-          </div>
+
           <div className="row w-100">
             <div className="col-4">
               <StickyBox offsetTop={20} offsetBottom={20}>
@@ -742,12 +722,23 @@ export default function AddUser({ optionSelection, socket }) {
               <div ref={componentRef} className="p-5">
                 <div>
                   <div className="d-flex justify-content-center">
-                    <h2 className="mt-3">
-                      <b>
-                        তোফা এন্ড সুফা{" "}
-                        <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
-                      </b>
-                    </h2>
+                    <div style={{ textAlign: "center" }}>
+                      <div>
+                        <img
+                          style={{ width: "10%" }}
+                          src={handshakeIcon}
+                          alt=""
+                        />
+                      </div>
+                      <div>
+                        <h2 className="mt-3">
+                          <b>
+                            তোফা এন্ড সুফা{" "}
+                            <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
+                          </b>
+                        </h2>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="d-flex justify-content-center">
@@ -909,12 +900,231 @@ export default function AddUser({ optionSelection, socket }) {
                 </div>
               </div>
             </div>
-            <div>
+            <div className="mt-2">
               <ReactToPrint
-                trigger={() => <button>Save Or Print</button>}
+                trigger={() => (
+                  <Button variant="contained">Print Document</Button>
+                )}
                 content={() => componentRef.current}
               />
             </div>
+          </div>
+          <div className="mt-5 p-5 m-5">
+            <div className="p-2 border">
+              <div
+                ref={componentCardRef}
+                className="border m-3"
+                style={{ width: "450px", height: "300px" }}
+              >
+                <div className="mt-2 d-flex justify-content-center">
+                  <div style={{ textAlign: "center" }}>
+                    <div>
+                      <img
+                        style={{ width: "10%" }}
+                        src={handshakeIcon}
+                        alt=""
+                      />
+                    </div>
+                    <div>
+                      <h6 style={{ fontSize: "14px" }} className="mt-2">
+                        <b>
+                          তোফা এন্ড সুফা{" "}
+                          <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
+                        </b>
+                      </h6>
+                    </div>
+                    <div className="d-flex justify-content-center">
+                      <span style={{ fontSize: "12px" }}>
+                        {" "}
+                        <b>ফোন : ০১৮৭৭১৩৪৭৩১</b>
+                      </span>
+                    </div>
+                    <div
+                      className="
+                d-flex justify-content-center"
+                    >
+                      <hr style={{ width: "30%", margin: "10px" }} />
+                    </div>
+                    <div className="">
+                      <div className="row">
+                        <div className="col-5">
+                          {" "}
+                          <div>
+                            <img src={QrCodeImg} alt="" />
+                          </div>{" "}
+                          <span>
+                            {" "}
+                            <b style={{ color: "red" }}>{accountNumber}</b>
+                          </span>
+                        </div>
+                        <div
+                          className="col-1 d-flex justify-content-center"
+                          style={{
+                            margin: "0px",
+                            padding: "0px",
+                            textAlign: "center",
+                          }}
+                        >
+                          <div className="d-flex" style={{ height: "150px" }}>
+                            <div className="vr"></div>
+                          </div>
+                        </div>
+                        <div className="col-6">
+                          <div>
+                            <img
+                              style={{ width: "40%", borderRadius: "10%" }}
+                              src={userImage}
+                              alt=""
+                            />
+                          </div>
+                          <div>
+                            <b>{userName}</b>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: "14px" }}>
+                              {infoType} :{" "}
+                              <b style={{ color: "red" }}>{accountNumber}</b>
+                            </span>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: "14px" }}>
+                              ফোন : {userPrimaryPhoneNumber}
+                            </span>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: "14px" }}>
+                              {userSecondaryPhoneNumber !== "" &&
+                                `${userSecondaryPhoneNumber}`}{" "}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-2">
+              <div>
+                <ReactToPrint
+                  trigger={() => (
+                    <Button variant="contained">Print Card</Button>
+                  )}
+                  content={() => componentCardRef.current}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 p-5 m-5">
+            <div className="p-2 border">
+              <div
+                ref={componentCardNoImageRef}
+                className="border m-3"
+                style={{ width: "450px", height: "300px" }}
+              >
+                <div className="mt-2 d-flex justify-content-center">
+                  <div style={{ textAlign: "center" }}>
+                    <div>
+                      <img
+                        style={{ width: "10%" }}
+                        src={handshakeIcon}
+                        alt=""
+                      />
+                    </div>
+                    <div>
+                      <h6 style={{ fontSize: "14px" }} className="mt-2">
+                        <b>
+                          তোফা এন্ড সুফা{" "}
+                          <b style={{ color: "red" }}>এন্টারপ্রাইজ</b>{" "}
+                        </b>
+                      </h6>
+                    </div>
+                    <div className="d-flex justify-content-center">
+                      <span style={{ fontSize: "12px" }}>
+                        {" "}
+                        <b>ফোন : ০১৮৭৭১৩৪৭৩১</b>
+                      </span>
+                    </div>
+                    <div
+                      className="
+                d-flex justify-content-center"
+                    >
+                      <hr style={{ width: "30%", margin: "10px" }} />
+                    </div>
+                    <div className="">
+                      <div className="row">
+                        <div className="col-5">
+                          {" "}
+                          <div>
+                            <img src={QrCodeImg} alt="" />
+                          </div>{" "}
+                          <span>
+                            {" "}
+                            <b style={{ color: "red" }}>{accountNumber}</b>
+                          </span>
+                        </div>
+                        <div
+                          className="col-1 d-flex justify-content-center"
+                          style={{
+                            margin: "0px",
+                            padding: "0px",
+                            textAlign: "center",
+                          }}
+                        >
+                          <div className="d-flex" style={{ height: "150px" }}>
+                            <div className="vr"></div>
+                          </div>
+                        </div>
+                        <div className="col-6">
+                          <div style={{ textAlign: "left", fontSize: "14px" }}>
+                            <div>
+                              নাম : <b>{userName}</b>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: "14px" }}>
+                                {infoType} :{" "}
+                                <b style={{ color: "red" }}>{accountNumber}</b>
+                              </span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: "14px" }}>
+                                ফোন : {userPrimaryPhoneNumber}{" "}
+                                {userSecondaryPhoneNumber !== "" && `,`}{" "}
+                              </span>
+                            </div>
+                            <div>
+                              <span
+                                style={{ fontSize: "14px", marginLeft: "40px" }}
+                              >
+                                {userSecondaryPhoneNumber !== "" &&
+                                  `${userSecondaryPhoneNumber}`}{" "}
+                              </span>
+                            </div>
+                            <div>গ্রাম :{userVillage}</div>
+                            <div>ইউনিয়ন : {userUnion}</div>
+                            <div>থানা : {userThana}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-2">
+              <div>
+                <ReactToPrint
+                  trigger={() => (
+                    <Button variant="contained">Print Card</Button>
+                  )}
+                  content={() => componentCardNoImageRef.current}
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <UserCard></UserCard>
           </div>
         </div>
       )}

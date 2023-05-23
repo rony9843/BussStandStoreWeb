@@ -9,8 +9,10 @@ export default function AddProduct() {
 
   useEffect(() => {
     if (
-      inputProductQrCode.charAt(0) === "e" &&
-      inputProductQrCode.at(-1) === "e"
+      (inputProductQrCode.charAt(0) === "e" &&
+        inputProductQrCode.at(-1) === "e") ||
+      (inputProductQrCode.charAt(0) === "b" &&
+        inputProductQrCode.at(-1) === "b")
     ) {
       timerQrCode();
     }
